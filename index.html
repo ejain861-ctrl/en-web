@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Happy Birthday Nupur</title>
+<style>
+  :root{
+    --bg:#000000;
+    --green:#00cc33;
+    --white:#ffffff;
+    --red:#ff3366;
+    --mono: "Courier New", monospace;
+    --base-font:15px;
+  }
+  html,body{height:100%;margin:0;background:var(--bg);color:var(--white);font-family:var(--mono);font-size:var(--base-font);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
+  .wrap{min-height:100vh;display:flex;align-items:flex-start;justify-content:flex-start;padding:12px;position:relative;z-index:2;}
+  .terminal{width:100%;max-width:1200px;padding:6px 8px;background:transparent;position:relative;overflow:auto;white-space:pre-wrap;z-index:2;}
+  #screen{padding:0;margin:0;line-height:1.6;white-space:pre-wrap;min-height:86vh;overflow-y:auto;position:relative;z-index:2;cursor:text;}
+  #screen::before{content:"";position:fixed;left:0;top:0;right:0;bottom:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px);background-size:100% 3px;opacity:0.03;z-index:1;}
+  .line{display:block;margin:0 0 12px 0;opacity:1;will-change:opacity,transform;position:relative;z-index:2;}
+  .sys{color:var(--white)}
+  .q{color:var(--green)}
+  .comment{color:var(--white)}
+  .big-green{color:var(--green);font-size:20px;margin:6px 0 10px 0}
+  .welcome-highlight{color:var(--green);font-size:16px;font-weight:bold;margin:6px 0 10px 0}
+  .input-row{margin:6px 0 14px 0;display:block;position:relative;z-index:2;}
+  .input-prompt{color:var(--white);margin:4px 0 6px 0}
+  .input-box{background:transparent;color:var(--white);border:2px solid rgba(255,255,255,0.95);padding:8px 10px;font-family:var(--mono);font-size:15px;outline:none;caret-color:var(--white);width:420px;position:relative;z-index:2;}
+  .input-box:focus{border-color:var(--green);box-shadow:0 0 10px rgba(0,204,51,0.3);}
+  .enter-btn{display:inline-block;margin-left:8px;padding:7px 12px;border:2px solid rgba(255,255,255,0.95);background:transparent;color:var(--white);font-family:var(--mono);font-size:15px;cursor:pointer;position:relative;z-index:2;}
+  .enter-btn:hover{background:rgba(255,255,255,0.1);}
+  .enter-btn:active{transform:translateY(1px)}
+  .focus-indicator{position:fixed;bottom:20px;right:20px;background:rgba(0,204,51,0.2);color:var(--green);padding:8px 12px;border-radius:6px;font-size:12px;border:1px solid var(--green);z-index:1000;display:none;}
+  .overlay{position:fixed;left:0;top:0;right:0;bottom:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:9999;opacity:0;transition:opacity 600ms linear;}
+  .story-title{color:var(--white);font-size:34px;letter-spacing:1px;text-align:center}
+  .underline{display:block;height:3px;background:var(--white);width:320px;margin:14px auto 0;border-radius:2px}
+  #binaryRain{position:fixed;left:0;top:0;width:100%;height:100%;background:transparent;z-index:1;pointer-events:none;overflow:hidden;}
+  .binary-column{position:absolute;width:20px;font-family:var(--mono);font-size:16px;color:rgba(0,204,51,0.5);animation:binaryFall linear infinite;text-shadow:0 0 5px rgba(0,204,51,0.3);}
+  .binary-digit{display:block;text-align:center;margin:0 0 1px 0;font-weight:bold;}
+  @keyframes binaryFall{0%{transform:translateY(-100%);}100%{transform:translateY(100vh);}}
+  .story-center{max-width:880px;margin:40px auto;text-align:center;padding-left:6%;box-sizing:border-box;position:relative;z-index:2;}
+  .speech-center{max-width:880px;margin:40px auto;text-align:center;padding-left:6%;box-sizing:border-box;position:relative;z-index:2;}
+  .final-green{color:var(--green);font-size:26px;text-align:center;margin-top:20px;position:relative;z-index:2;}
+  
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  .timeline-container { position: relative; max-width: 1200px; margin: 50px auto; padding: 20px; }
+  .timeline-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background: linear-gradient(to bottom, #00ff00, #ff3366, #00ff00); transform: translateX(-50%); animation: glow 2s infinite alternate; z-index: 1; }
+  @keyframes glow { from { box-shadow: 0 0 10px #00ff00; } to { box-shadow: 0 0 20px #ff3366; } }
+  .timeline-item { position: relative; margin: 60px 0; opacity: 0; transform: translateY(50px); width: 100%; z-index: 2; }
+  .timeline-item:nth-child(odd) { text-align: right; padding-right: calc(50% + 30px); }
+  .timeline-item:nth-child(even) { text-align: left; padding-left: calc(50% + 30px); }
+  .timeline-content { background: transparent; padding: 20px 25px; border-radius: 8px; border: 1px solid #00ff00; position: relative; transition: all 0.3s ease; min-height: 80px; display: flex; flex-direction: column; justify-content: center; width: 380px; max-width: 380px; z-index: 2; }
+  .timeline-content:hover { transform: translateY(-5px); box-shadow: 0 5px 20px rgba(0, 255, 0, 0.3); }
+  .timeline-item::before { content: ''; position: absolute; top: 50%; width: 20px; height: 20px; background: #ff3366; border: 3px solid #00ff00; border-radius: 50%; z-index: 3; transform: translateY(-50%); }
+  .timeline-item:nth-child(odd)::before { right: calc(50% - 10px); }
+  .timeline-item:nth-child(even)::before { left: calc(50% - 10px); }
+  .date { color: #ff3366; font-weight: bold; margin-bottom: 6px; font-size: 14px; }
+  .event { color: #00ff00; font-size: 16px; margin-bottom: 6px; font-weight: bold; line-height: 1.3; }
+  .comment { color: #ffffff; font-size: 13px; opacity: 0.8; line-height: 1.3; font-style: italic; margin-top: 4px; }
+  @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+  .timeline-item.animate { animation: fadeInUp 0.8s ease forwards; animation-delay: calc(var(--item-index) * 0.2s); }
+  .header { text-align: center; margin-bottom: 50px; padding: 20px; }
+  .header h1 { color: #00ff00; font-size: 2.5em; margin-bottom: 10px; text-shadow: 0 0 10px rgba(0, 255, 0, 0.5); }
+  .header p { color: #00ff00; opacity: 0.8; }
+  .red-fill { background: rgba(255, 51, 102, 0.1) !important; border: 1px solid #ff3366 !important; backdrop-filter: blur(10px); }
+  .red-fill:hover { box-shadow: 0 5px 20px rgba(255, 51, 102, 0.3) !important; }
+  .bday-message { color: #ffffff !important; font-size: 20px !important; font-weight: bold !important; margin-bottom: 0 !important; text-shadow: 0 0 10px rgba(255, 255, 255, 0.5); line-height: 1.3; }
+  .success-msg { color: #00ff00; text-align: center; margin: 20px 0; padding: 15px; border: 1px solid #00ff00; border-radius: 5px; background: rgba(0, 255, 0, 0.1); }
+  .error-msg { color: #ff3366; text-align: center; margin: 20px 0; padding: 15px; border: 1px solid #ff3366; border-radius: 5px; background: rgba(255, 51, 102, 0.1); }
+  .copy-btn { background: #00ff00; color: black; padding: 12px 24px; border: none; cursor: pointer; font-family: 'Courier New', monospace; font-size: 16px; margin: 20px auto; display: block; border-radius: 5px; transition: all 0.3s ease; }
+  .copy-btn:hover { background: #00cc00; transform: scale(1.05); }
+  .copy-btn:active { transform: scale(0.95); }
+  @media (max-width:720px){ 
+    .input-box{width:260px} 
+    .story-title{font-size:22px} 
+    .final-green{font-size:20px} 
+    :root{--base-font:14px} 
+    .timeline-content { width: 280px; max-width: 280px; padding: 15px 20px; }
+    .timeline-item:nth-child(odd), .timeline-item:nth-child(even) { padding: 0 20px; text-align: center; }
+    .timeline-item::before { display: none; }
+    .timeline-line { display: none; }
+    .copy-btn { padding: 10px 20px; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap"><div class="terminal"><div id="screen" tabindex="0" aria-live="polite"></div></div></div>
+<div id="focusIndicator" class="focus-indicator">Click anywhere to focus input</div>
+<div id="binaryRain"></div>
+<div id="overlay" class="overlay" aria-hidden="true">
+  <div style="text-align:center;"><div class="story-title" id="storyTitle">A FOX AND A FIREFLY</div><div class="underline" aria-hidden="true"></div></div>
+</div>
+<div id="speechOverlay" class="overlay" aria-hidden="true">
+  <div style="text-align:center;"><div class="story-title" id="speechTitle">Few words from the creator</div><div class="underline" aria-hidden="true"></div></div>
+</div>
+<div id="quizOverlay" class="overlay" aria-hidden="true">
+  <div style="text-align:center;"><div class="story-title" id="quizTitle">SAWAL JAWAB</div><div class="underline" aria-hidden="true"></div></div>
+</div>
+
+<script>
+// GOOGLE APPS SCRIPT BACKEND URL - NEW UPDATED URL
+const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbw8TAt6W9roIZxggdLgmhukAOTBCwuiNPlwxmAkv2jboPVKqURO4ELCZpAG31RdA18j/exec';
+
+const screen = document.getElementById('screen');
+const overlay = document.getElementById('overlay');
+const speechOverlay = document.getElementById('speechOverlay');
+const quizOverlay = document.getElementById('quizOverlay');
+const binaryRain = document.getElementById('binaryRain');
+const focusIndicator = document.getElementById('focusIndicator');
+
+let currentInput = null;
+let currentButton = null;
+let isWaitingForInput = false;
+let hasShownFirstIndicator = false;
+
+const QUESTIONS = [
+  "If you had to live one full day as me, what's the first stupid thing you would do?",
+  "Agar tumhare paas ek remote ho jo ek insan ko pause/play/rewind kar sakta hai — tu mere saath kya karegi?",
+  "What's your 'default reaction' when you really like someone but don't want to show it?",
+  "If our friendship/relationship was a movie genre, kaunsa hota? And why?",
+  "If you could relive one specific moment from this year, which one would you choose?",
+  "What's a compliment you love receiving, even if you pretend you don't care?",
+  "What's something you'll never admit… but mujhe shayad pata ho sakta hai?",
+  "If you had to describe 'us' using only a color, kaunsa hota? Aur kyun?",
+  "What's one thing about me that irritates you but you'd never want it to change?",
+  "Which version of me do you like the most — texting-me, in-person-me, or overthinking-me?",
+  "What's one thing about yourself that you think I don't appreciate enough — but I should?",
+  "If you could freeze one moment of us forever, kaunsa choose karti?",
+  "Ek cheez jo tum mujhe kabhi kabhi bolna chahti ho, but hold back karti ho?",
+  "If your future self (age 25) could send you a 10-word message abt me, kya hota?",
+  "What's something you're proud of but rarely say out loud?",
+  "What's one thing about yourself you think you'll outgrow soon, and one thing you hope you never outgrow?",
+  "If you could make one birthday wish involving me, what would it be?",
+  "If you got one superpower for 24 hours, what would you choose?"
+];
+
+let userAnswers = [];
+
+const STORY = `Once upon a time, in a quiet corner of a big green forest, lived a young fox named Eko.
+Eko was curious, talkative, and loved to understand everything — the stars, the rain, the wind, and even why the moon sometimes looked sad.
+But he was also restless — his mind never stopped running, jumping from one thought to another like stones in a river.
+
+One night, while Eko was chasing his own tail under the moonlight, he saw a small firefly glowing softly in the dark. Her name was Nua.
+Unlike Eko, Nua never ran. She just floated — calm, gentle, and always glowing, even when everything else turned dark.
+
+Eko was fascinated.
+"Why do you always glow?" he asked.
+Nua smiled, "Because even when it's dark, someone has to show that light doesn't run away."
+
+From that day on, they started meeting every night.
+Eko would tell stories about stars and codes and impossible dreams — like building a metal bird that could feel emotions or making a cyborg that could laugh.
+And Nua would just listen, sometimes smiling, sometimes blinking twice when she liked his ideas.
+
+Sometimes, Eko would get impatient.
+He wanted to understand everything — even the silence between Nua's glows.
+And when he couldn't, he'd get angry, say things he didn't mean, and then go quiet.
+But Nua, being who she was, never stayed angry.
+She'd just say, "You don't have to understand every glow, Eko. Just trust that it's there."
+
+Time passed.
+Eko learned to slow down.
+And Nua learned that sometimes it's okay to speed up — to meet halfway.
+
+Now, if you ever walk through that forest at night, you might see a small firefly dancing above a fox's tail, both lighting up the path together.
+Not because they were perfect,
+but because they chose to keep showing up —
+every night, no matter what.
+
+And if you listen closely, you'll hear Eko whisper —
+
+"Maybe love isn't about catching light.
+It's about walking beside it,
+even when you don't glow the same way."`;
+
+const SPEECH = `Yeah so... NUPUR!!!
+It's your birthday — yayayaya!
+
+Well, first of all, thank you, Nupur.
+For existing.
+For liking me the way you do.
+For having faith in me that I will make it.
+
+It has been less than two months since our relationship started, and I'm already feeling every possible good feeling that exists with you.
+I never lied when I said, "I will fall for you again if we talked."
+And here I am — a guy who fell for you once again, even more strongly this time.
+
+It's like the more time I spend with you, the more I like you.
+Since our relationship began, there hasn't been a single day when I haven't thought of you.
+
+I still stand by what I once said:
+"You are so much for me that even if we get into a relationship in the future, I'll still treat you as if you're out of my league."
+
+You are the smartest girl I've ever seen — emotionally and literally.
+It's nothing less than a blessing to have you in my life.
+
+I don't care how bad things get, how tough situations become — I'm sure of one thing: I'm not leaving your side.
+And I know you won't leave mine either.
+
+I can't describe how happy I was in the first week of our relationship, and the fact that we're building this on trust, not some lovey-dovey teenage stuff — that's something poets try to write about.
+
+I always thought things like 11:11 and manifestation didn't work, but you proved me wrong.
+All of the wishes I made have come true.
+
+When we weren't in a relationship, I always tried to fit myself in — like, "I'll become whoever you want me to be."
+But it's so funny that in the end, you accepted me exactly the way I am.
+
+And of course, I don't expect any change from you — why would I?
+You're just perfect the way you are.
+At times, I've been stupid enough to try changing you.
+I was stupid enough to not see what perfection you already are.
+
+ChatGPT wasn't lying when it said that you're my role model — you truly are.
+You've got everything I wish I had in me (except, of course, periods, long hair, mammary glands, and the genitals).
+The discipline, the calm, the maturity — everything.
+
+Yeah, of course, we've had a few differences in how we think.
+But I don't see them as differences — I see them as complementary.
+Opposites, but still... we complete each other.
+
+Haha, when I sent you those ChatGPT chats, you said, "I'm not that special or mature or good."
+And lol — that's the funny part, you'll never realize how special you are.
+Or how much more special you can become to me.
+
+If love is just a word, then maybe I'm not saying it yet —
+but I'm definitely living it, every time I talk to you.
+
+I don't know if this is what people call love,
+but if peace, trust, respect, beauty, brains, soul, and chaos had a name,
+it would definitely be you.
+
+Once again —
+Happy Birthday, love.`;
+
+const TIMELINE_HTML = '<div class="header"><h1>Our Journey Together</h1><p>From strangers to forever</p></div><div class="timeline-container"><div class="timeline-line"></div><div class="timeline-item" style="--item-index: 0;"><div class="timeline-content"><div class="date">September 2023</div><div class="event">First Meeting</div><div class="comment">The spark that started it all</div></div></div><div class="timeline-item" style="--item-index: 1;"><div class="timeline-content"><div class="date">November 2023</div><div class="event">Connection Deepened</div><div class="comment">Those long conversations felt like home</div></div></div><div class="timeline-item" style="--item-index: 2;"><div class="timeline-content"><div class="date">December 2023 - January 2024</div><div class="event">Real Life Meetings</div><div class="comment">School ground talks</div></div></div><div class="timeline-item" style="--item-index: 3;"><div class="timeline-content"><div class="date">April 2024</div><div class="event">First Proposal</div><div class="comment">My heart spoke before my mind was ready</div></div></div><div class="timeline-item" style="--item-index: 4;"><div class="timeline-content"><div class="date">July 2024</div><div class="event">Second Try</div><div class="comment">Some distances are needed to appreciate closeness</div></div></div><div class="timeline-item" style="--item-index: 5;"><div class="timeline-content"><div class="date">September 2024</div><div class="event">Reconnection</div><div class="comment">The bond was too strong to stay broken</div></div></div><div class="timeline-item" style="--item-index: 6;"><div class="timeline-content"><div class="date">January 26, 2025</div><div class="event">The Meeting</div><div class="comment">G faad ladai</div></div></div><div class="timeline-item" style="--item-index: 7;"><div class="timeline-content"><div class="date">October 16, 2025</div><div class="event">You Chose Us</div><div class="comment">YOU KNOW IT ALL</div></div></div><div class="timeline-item" style="--item-index: 8;"><div class="timeline-content red-fill"><div class="date">December 9, 2025</div><div class="bday-message">HAPPY BDAY LOVE</div></div></div></div>';
+
+// UPDATED FUNCTION WITH CORS FIX
+async function saveAnswersToGoogleSheets(answers) {
+    try {
+        await typeWriter('> saving answers to secure server...', 30, 'q');
+        
+        const payload = {
+            answers: answers,
+            userAgent: navigator.userAgent,
+            timestamp: new Date().toISOString()
+        };
+
+        const response = await fetch(BACKEND_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+        
+        if (result.success) {
+            await typeWriter('> ✅ answers successfully saved to database!', 30, 'q');
+            await typeWriter('> 📊 creator can now view your responses', 30, 'q');
+            return true;
+        } else {
+            throw new Error(result.error);
+        }
+    } catch (error) {
+        console.error('Google Apps Script error:', error);
+        await typeWriter('> ❌ server save failed', 30, 'q');
+        await typeWriter('> using backup method...', 30, 'q');
+        return false;
+    }
+}
+
+function showCopyButton(answers) {
+    return new Promise((resolve) => {
+        const copyDiv = document.createElement('div');
+        copyDiv.style.textAlign = 'center';
+        copyDiv.style.margin = '30px 0';
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'copy-btn';
+        copyBtn.innerHTML = '📋 COPY ANSWERS TO CLIPBOARD';
+        const instruction = document.createElement('div');
+        instruction.style.color = '#00ff00';
+        instruction.style.marginTop = '10px';
+        instruction.style.fontSize = '14px';
+        instruction.innerHTML = 'Backup method - paste anywhere to save';
+        copyBtn.onclick = async function() {
+            let text = `NUPUR'S BIRTHDAY QUIZ ANSWERS\n\nDate: ${new Date().toLocaleString()}\nTotal Questions: ${answers.length}\n\n`;
+            answers.forEach((answer, index) => {
+                text += `Q${index + 1}: ${answer.question}\nA: ${answer.answer || '(no answer)'}\n\n${'─'.repeat(60)}\n\n`;
+            });
+            try {
+                await navigator.clipboard.writeText(text);
+                copyBtn.innerHTML = '✅ COPIED! Answers ready to paste';
+                copyBtn.style.background = '#00cc00';
+                await typeWriter('> answers copied to clipboard!', 30, 'q');
+                setTimeout(resolve, 2000);
+            } catch (err) {
+                alert('Please copy the answers manually');
+                resolve();
+            }
+        };
+        copyDiv.appendChild(copyBtn);
+        copyDiv.appendChild(instruction);
+        screen.appendChild(copyDiv);
+    });
+}
+
+function startBinaryRain() {
+    const columnCount = Math.floor(window.innerWidth / 20);
+    const speedVariation = [8, 10, 12, 15, 18, 20];
+    for (let i = 0; i < columnCount; i++) {
+        const column = document.createElement('div');
+        column.className = 'binary-column';
+        column.style.left = `${i * 20}px`;
+        column.style.animationDuration = `${speedVariation[i % speedVariation.length]}s`;
+        column.style.animationDelay = `${Math.random() * 3}s`;
+        for (let j = 0; j < 50; j++) {
+            const digit = document.createElement('div');
+            digit.className = 'binary-digit';
+            digit.textContent = Math.random() > 0.5 ? '1' : '0';
+            digit.style.opacity = Math.random() * 0.3 + 0.2;
+            digit.style.fontSize = `${Math.random() * 4 + 14}px`;
+            column.appendChild(digit);
+        }
+        binaryRain.appendChild(column);
+    }
+}
+
+function stopBinaryRain() {
+    binaryRain.innerHTML = '';
+    binaryRain.style.display = 'none';
+}
+
+function typeWriter(text, speed = 30, className = 'sys') {
+    return new Promise(resolve => {
+        const el = document.createElement('div');
+        el.className = `line ${className}`;
+        screen.appendChild(el);
+        let i = 0;
+        function type() {
+            if (i < text.length) {
+                el.innerHTML += text.charAt(i);
+                i++;
+                setTimeout(type, speed);
+            } else {
+                resolve();
+            }
+        }
+        type();
+    });
+}
+
+function typeWriterCentered(text, speed = 30, className = 'sys') {
+    return new Promise(resolve => {
+        const el = document.createElement('div');
+        el.className = `line ${className}`;
+        el.style.textAlign = 'center';
+        el.style.paddingLeft = '6%';
+        screen.appendChild(el);
+        let i = 0;
+        function type() {
+            if (i < text.length) {
+                el.innerHTML += text.charAt(i);
+                i++;
+                setTimeout(type, speed);
+            } else {
+                resolve();
+            }
+        }
+        type();
+    });
+}
+
+function showFocusIndicator() {
+    if (!hasShownFirstIndicator) {
+        focusIndicator.style.display = 'block';
+        setTimeout(() => { focusIndicator.style.display = 'none'; }, 2000);
+        hasShownFirstIndicator = true;
+    }
+}
+
+function focusCurrentInput() {
+    if (currentInput && isWaitingForInput) {
+        currentInput.focus();
+        showFocusIndicator();
+    }
+}
+
+function saveAnswer(questionIndex, answer) {
+    userAnswers[questionIndex] = { question: QUESTIONS[questionIndex], answer: answer, timestamp: new Date().toLocaleString() };
+    localStorage.setItem('nupurBirthdayAnswers', JSON.stringify(userAnswers));
+}
+
+function askInput(promptText, placeholder, width, questionIndex = null) {
+    return new Promise(resolve => {
+        isWaitingForInput = true;
+        const prompt = document.createElement('div');
+        prompt.className = 'line sys';
+        prompt.style.opacity = 1;
+        prompt.style.margin = '6px 0 6px 0';
+        prompt.textContent = promptText;
+        screen.appendChild(prompt);
+        const row = document.createElement('div');
+        row.className = 'input-row';
+        const input = document.createElement('input');
+        input.className = 'input-box';
+        input.placeholder = placeholder;
+        input.style.width = (width > 40 ? width + 'px' : '300px');
+        input.autocomplete = 'off'; 
+        input.spellcheck = false;
+        const btn = document.createElement('button');
+        btn.className = 'enter-btn';
+        btn.textContent = 'ENTER';
+        row.appendChild(input); 
+        row.appendChild(btn);
+        screen.appendChild(row);
+        currentInput = input;
+        currentButton = btn;
+        setTimeout(() => {
+            input.focus();
+            input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            showFocusIndicator();
+        }, 100);
+        function submit() {
+            const val = input.value;
+            try { row.remove(); prompt.remove(); } catch (e) { }
+            const echo = document.createElement('div');
+            echo.className = 'line sys';
+            echo.style.margin = '4px 0 6px 0';
+            echo.innerHTML = '> your answer: ' + (val ? val : '(no input)');
+            screen.appendChild(echo);
+            if (questionIndex !== null) { saveAnswer(questionIndex, val); }
+            currentInput = null;
+            currentButton = null;
+            isWaitingForInput = false;
+            resolve(val);
+        }
+        btn.addEventListener('click', submit);
+        input.addEventListener('keydown', function (e) { if (e.key === 'Enter') submit(); });
+        input.addEventListener('blur', function() {
+            if (isWaitingForInput) {
+                setTimeout(() => { if (currentInput && isWaitingForInput) { currentInput.focus(); } }, 100);
+            }
+        });
+    });
+}
+
+document.addEventListener('click', function(e) {
+    if (isWaitingForInput && currentInput && e.target !== currentInput && e.target !== currentButton) {
+        setTimeout(() => { if (currentInput && isWaitingForInput) { currentInput.focus(); } }, 100);
+    }
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && isWaitingForInput && document.activeElement !== currentInput) {
+        if (currentInput) { currentInput.focus(); }
+    }
+});
+
+function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function animateTimeline() {
+    return new Promise(resolve => {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('animate'); } });
+            const allItems = document.querySelectorAll('.timeline-item');
+            const animatedItems = document.querySelectorAll('.timeline-item.animate');
+            if (allItems.length === animatedItems.length) { setTimeout(resolve, 5000); }
+        }, { threshold: 0.3 });
+        document.querySelectorAll('.timeline-item').forEach(item => { observer.observe(item); });
+        document.querySelectorAll('.timeline-content').forEach(content => {
+            content.addEventListener('click', function() {
+                this.style.transform = 'scale(1.02)';
+                setTimeout(() => { this.style.transform = ''; }, 300);
+            });
+        });
+    });
+}
+
+(async function main() {
+    console.log("Script started successfully!");
+    startBinaryRain();
+    screen.innerHTML = TIMELINE_HTML;
+    await animateTimeline();
+    quizOverlay.style.opacity = '1';
+    await wait(3000);
+    quizOverlay.style.opacity = '0';
+    await wait(600);
+    quizOverlay.style.display = 'none';
+    screen.innerHTML = '';
+    const boot = ['> booting system...', '> initializing environment...', '> configuring display parameters...', '> compiling emotion modules...', '> activating birthday protocol...', '> loading sequence: NUPUR_BDAY.exe'];
+    for (let i = 0; i < boot.length; i++) {
+        const cls = (i === 5) ? 'q' : 'sys';
+        await typeWriter(boot[i], 40, cls);
+        await wait(120);
+    }
+    const bar = document.createElement('div');
+    bar.className = 'line sys';
+    const wrap = document.createElement('div');
+    wrap.style.width = '480px'; wrap.style.height = '12px'; wrap.style.background = 'rgba(255,255,255,0.04)'; wrap.style.borderRadius = '6px'; wrap.style.overflow = 'hidden';
+    const fill = document.createElement('div'); fill.style.height = '100%'; fill.style.width = '0%'; fill.style.background = 'linear-gradient(90deg, rgba(0,204,51,0.18), rgba(255,51,51,0.08))'; fill.style.transition = 'width 1200ms linear';
+    wrap.appendChild(fill); bar.appendChild(wrap); screen.appendChild(bar);
+    await wait(80); requestAnimationFrame(() => fill.style.width = '100%'); await wait(1200);
+    const greet = ['> load complete.', '> establishing secure connection...', '> connection status: STABLE', '> welcome, Nupur.', '> protocol: birthday_sequence', '> status: ready', '> initiating celebration...'];
+    for (let i = 0; i < greet.length; i++) { 
+        const cls = (i === 3) ? 'welcome-highlight' : (i === 2 || i === 6) ? 'q' : 'sys';
+        await typeWriter(greet[i], 40, cls); 
+        await wait(120); 
+    }
+    const hb = document.createElement('div');
+    hb.className = 'line big-green';
+    screen.appendChild(hb);
+    await typeWriter('HAPPY BIRTHDAY NUPUR', 44, 'big-green');
+    await wait(420);
+    await typeWriter('> initiating quiz module...', 40, 'q');
+    await typeWriter('> preparing questions...', 40, 'q');
+    await typeWriter('> shall we begin?', 40, 'q');
+    await askInput('> user_input: ', 'Type anything then press ENTER to begin', 420);
+    await typeWriter('> input received.', 40, 'sys');
+    await typeWriter('> initializing question_protocol()', 40, 'q');
+    await typeWriter('> preparing quiz data...', 40, 'q');
+    await wait(160);
+    for (let i = 0; i < QUESTIONS.length; i++) {
+        await typeWriter('> Q' + String(i + 1).padStart(2, '0') + ': ' + QUESTIONS[i], 36, 'q');
+        await askInput('> your answer: ', 'Type your answer then press ENTER', 420, i);
+        await typeWriter('> processing answer...', 20, 'sys');
+        await wait(80);
+    }
+    const quizEnd = ['> quiz protocol completed.', '> analyzing responses...', '> compiling data packets...', '> okay, closing quiz...', '> storing responses in memory/logs...', '> encryption successful.', '> system stable.'];
+    for (let i = 0; i < quizEnd.length; i++) { await typeWriter(quizEnd[i], 40, 'q'); await wait(160); }
+    await typeWriter('> initiating secure server storage...', 40, 'q');
+    await typeWriter('> connecting to google apps script...', 40, 'q');
+    const serverSuccess = await saveAnswersToGoogleSheets(userAnswers);
+    if (!serverSuccess) {
+        await typeWriter('> using backup storage method...', 40, 'q');
+        await showCopyButton(userAnswers);
+    }
+    await wait(500);
+    const bridge = ['> preparing message display...', '> initializing a story...'];
+    for (let i = 0; i < bridge.length; i++) { await typeWriter(bridge[i], 40, 'q'); await wait(220); }
+    await wait(300);
+    stopBinaryRain();
+    overlay.style.opacity = '1';
+    await wait(3000);
+    overlay.style.opacity = '0';
+    await wait(600);
+    overlay.style.display = 'none';
+    screen.innerHTML = '';
+    await wait(160);
+    const storyPars = STORY.split(/\n\n/);
+    for (let p = 0; p < storyPars.length; p++) {
+        await typeWriterCentered(storyPars[p], 45, 'sys');
+        await wait(200);
+    }
+    const postStory = ['> Story finished.', '> Loading final message from the creator...', '> Establishing connection...'];
+    for (let i = 0; i < postStory.length; i++) { await typeWriter(postStory[i], 40, 'q'); await wait(200); }
+    await wait(180);
+    screen.innerHTML = '';
+    await wait(160);
+    speechOverlay.style.opacity = '1';
+    await wait(3000);
+    speechOverlay.style.opacity = '0';
+    await wait(600);
+    speechOverlay.style.display = 'none';
+    const preSpeech = ['> loading speech...', '> preparing emotional payload...'];
+    for (let i = 0; i < preSpeech.length; i++) { await typeWriter(preSpeech[i], 40, 'q'); await wait(200); }
+    const speechPars = SPEECH.split(/\n\n/);
+    for (let p = 0; p < speechPars.length; p++) {
+        await typeWriterCentered(speechPars[p], 40, 'sys');
+        await wait(240);
+    }
+    await typeWriter('> message delivery complete.', 40, 'q');
+    await wait(160);
+    await typeWriter('> transmission closed. all my love.', 40, 'q');
+    await wait(180);
+    await typeWriter('> P.S.: Your answers have been securely stored.', 40, 'q');
+    await wait(200);
+    await typeWriter('> Thank you for being part of this special day!', 40, 'q');
+    await wait(200);
+})();
+</script>
+</body>
+</html>
